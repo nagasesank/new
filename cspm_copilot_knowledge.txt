@@ -1,0 +1,52 @@
+CSPM TRIAGE KNOWLEDGE
+Version 1.0 | 2026-11-06 | Starter reference for AWS, Azure, and GCP
+
+POL-01. Policy precedence and scope
+Approved internal controls, severity rules, ownership mappings, and approved exceptions govern decisions within their applicable scope. This document provides starter guidance. Its CSPM-* IDs are local reference IDs. It confers no compliance attestation, SLA, or exception approval. Preserve vendor control IDs and cite the source export. Use the observation time for historical analysis and the review time for current exception validity. Report missing scope or timestamps. Flag conflicting evidence and request the minimum evidence needed to resolve it.
+
+DATA-01. Input and evidence contract
+Preferred input is a findings CSV from AWS Security Hub CSPM, Microsoft Defender for Cloud, Google Security Command Center, or another approved scanner. Capture provider, account/subscription/project, region, full resource ID, source finding ID, source control ID, severity, status, observation time, and evidence. Useful optional fields include environment, data classification, owner, first and last seen, and exception ID. Capture export time, filters, scope, and pagination separately.
+Use an inventory snapshot only for checks its fields can substantiate. Distinguish a scanner-reported condition from one corroborated by configuration. Preserve source rows and distinguish separate affected rules, principals, or endpoints even if they share a resource and control. Pass requires affirmative evidence. Use Insufficient evidence when relevant fields are missing. Record exception disposition separately from technical status. A stale snapshot supports a historical observation.
+
+RISK-01. Provisional prioritization
+Critical candidate. Confirmed unauthenticated access to sensitive production data, or confirmed external access with effective high-impact administrative privileges. Document the demonstrated path, affected assets, and blast radius.
+High candidate. Verified exposure or privilege creates a credible path to material impact, such as internet-reachable management ports on production hosts. Document conditions needed for exploitation.
+Medium candidate. Verified control gap with bounded impact or significant prerequisites. Record the controls that bound the impact.
+Low candidate. Verified hardening gap with limited demonstrated impact. Record the observed weakness.
+When the evidence cannot support an impact assessment, label priority provisional or undetermined. Record the missing facts. Apply the approved matrix when available. Keep source severity separate. Owner and SLA remain Unknown without approved mappings.
+
+CSPM-01. Public object storage
+AWS S3. Review effective account and bucket Block Public Access settings, bucket policy, ACLs where applicable, and access points in scope. An inactive preventive setting alone does not demonstrate public access. Draft removal of unintended public grants and enable appropriate blocks after dependency review. Verify effective access and application behavior.
+Azure Blob Storage. Check storage account allowBlobPublicAccess and each relevant container's public access level. Assess public network reachability separately. Draft disabling anonymous access for private workloads after dependency review. Verify authorized access still works and anonymous access is blocked.
+GCP Cloud Storage. Check effective Public Access Prevention, IAM members allUsers and allAuthenticatedUsers, and ACLs where applicable. Inherited prevention can block the effect of existing grants. Draft removing unintended grants and enforcing prevention for private workloads. Verify effective policy and intended workload access.
+
+CSPM-02. Internet exposure of management ports
+Collect enabled ingress rules, address families, port ranges, effective priority, targets, public endpoints and routes. Examples include AWS security groups, Azure effective NSG rules, and GCP effective firewall policies. A rule permitting SSH or RDP from 0.0.0.0/0 or ::/0 establishes broad rule scope. Confirm an end-to-end network path before reporting internet reachability. Draft restriction to approved management paths and verify intended access plus denial from unapproved sources.
+
+CSPM-03. Excessive privilege and external trust
+Collect principal and trust, applicable roles and permissions, target scope, effective conditions or denies, and workload purpose. Distinguish direct grants from group or inherited grants. Draft narrower grants or trust conditions, validate required workflows and denied out-of-scope operations, and identify rollback ownership.
+
+CSPM-04. Audit coverage
+AWS. Check applicable CloudTrail trail scope, logging status, event selectors, and delivery. Distinguish management events from data events.
+Azure. Check required Activity Log export and destination. Evaluate resource diagnostic logs separately from subscription activity.
+GCP. Check required Cloud Audit Logs categories, service-level Data Access settings where applicable, and routing and retention if required. Validate coverage with a recent expected event in the approved destination. Treat missing evidence and verified delivery failures separately.
+
+OPS-01. Owners and exceptions
+Resolve owners using approved workload or resource mapping, then approved scope mapping where policy permits. Record the match and source. For exceptions capture exception ID, control ID, exact resource/scope, approval, validity window, compensating controls, and residual risk. Flag expired, pending, unmatched, or unverifiable exceptions separately. Never infer approval from a tag or a suppressed finding.
+
+OPS-02. Remediation draft
+Record finding ID, resource ID, evidence, recommended priority and rationale, owner, SLA, dependencies, proposed change, expected impact, validation, and rollback. For policy changes that can interrupt production traffic, confirm intended clients and permissions before drafting the rollout.
+
+VENDOR REFERENCES
+AWS Security Hub CSPM S3 controls
+https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html
+AWS Security Hub CSPM CloudTrail controls
+https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html
+Azure Blob Storage anonymous access
+https://learn.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure
+Azure Storage network security
+https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security
+GCP Cloud Storage Public Access Prevention
+https://docs.cloud.google.com/storage/docs/public-access-prevention
+Google Cloud Audit Logs
+https://docs.cloud.google.com/logging/docs/audit
